@@ -6,13 +6,13 @@ import java.time.format.DateTimeFormatter;
 
 public class Reservation {
     private Integer roomNumber;
-    private LocalDate checkIn;
-    private LocalDate checkOut;
+    private LocalDate checkInDate;
+    private LocalDate checkOutDate;
 
-    public Reservation(Integer roomNumber, LocalDate checkIn, LocalDate checkOut) {
+    public Reservation(Integer roomNumber, LocalDate checkInDate, LocalDate checkOutDate) {
         this.roomNumber = roomNumber;
-        this.checkIn = checkIn;
-        this.checkOut = checkOut;
+        this.checkInDate = checkInDate;
+        this.checkOutDate = checkOutDate;
     }
 
     public Integer getRoomNumber() {
@@ -23,29 +23,39 @@ public class Reservation {
         this.roomNumber = roomNumber;
     }
 
-    public LocalDate getCheckIn() {
-        return checkIn;
+    public LocalDate getCheckInDate() {
+        return checkInDate;
     }
 
-    public LocalDate getCheckOut() {
-        return checkOut;
+    public LocalDate getCheckOutDate() {
+        return checkOutDate;
     }
 
     public long duration() {
-        Duration duration = Duration.between(checkIn.atStartOfDay(), checkOut.atStartOfDay());
+        Duration duration = Duration.between(checkInDate.atStartOfDay(), checkOutDate.atStartOfDay());
         return duration.toDays();
     }
 
-    public void updateDates(LocalDate checkIn, LocalDate checkOut) {
-        this.checkIn = checkIn;
-        this.checkOut = checkOut;
+    public String updateDates(LocalDate checkInDate, LocalDate checkOutDate) {
+        LocalDate now = LocalDate.now();
+        if(checkInDate.isBefore(now) || checkOutDate.isBefore(now)) {
+            return "Reservation dates for update must be future dates";
+        }
+
+        if (!checkOutDate.isAfter(checkInDate)) {
+            return "Check-out date must be after check-in date.";
+        }
+
+        this.checkInDate = checkInDate;
+        this.checkOutDate = checkOutDate;
+        return null;
     }
 
     @Override
     public String toString() {
         return " -> Room: " + roomNumber + "\n" +
-                " -> Check-in date: " + checkIn.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "\n" +
-                " -> Check-out date: " + checkOut.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "\n" +
-                " -> Duration: " + duration() + " nights.";
+                " -> Check-in date: " + checkInDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "\n" +
+                " -> Check-out date: " + checkOutDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) + "\n" +
+                " -> Duration: " + duration() + " nights";
     }
 }
